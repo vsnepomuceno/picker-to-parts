@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+<h:head>
+	<title>PTP</title>
+</h:head>
+<h:body>
+	<h:form id="formularioMenu" class="loginform">
+
+		<p:messages id="messages" />
+		<c:if test="#{uploadedFile == null}">
+			<p:fieldset legend="Upload File.">
+				<p:fileUpload
+					fileUploadListener="#{pTPController.validateInputFile}"
+					mode="advanced" dragDropSupport="false" update="formularioMenu"
+					sizeLimit="1000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" />
+			</p:fieldset>
+		</c:if>
+		<c:if test="#{uploadedFile != null}">
+			<p:fieldset legend="Configure and Execute GA.">
+				<p:commandButton value="Upload New File" update="@all"
+					actionListener="#{pTPController.uploadNewFile()}" />
+				<p:commandButton value="See Products List" update="@all"
+					action="#{pTPController.listProducts()}" />
+				<br />
+				<br />
+				<p:panelGrid columns="2">
+					<p:outputLabel value="Mutation Rate: " />
+					<p:inputText id="txtMut"
+						value="#{pTPController.propertiesBean.mutationRate}"
+						maxlength="12" />
+
+					<p:outputLabel value="Crossover rate: " />
+					<p:inputText id="txtCross"
+						value="#{pTPController.propertiesBean.crossoverRate}"
+						maxlength="12" />
+
+					<p:outputLabel value="Generations: " />
+					<p:inputText id="txtGene"
+						value="#{pTPController.propertiesBean.generations}" maxlength="12" />
+
+					<p:outputLabel value="Population Size: " />
+					<p:inputText id="txtPop"
+						value="#{pTPController.propertiesBean.populationInitialSize}"
+						maxlength="12" />
+				</p:panelGrid>
+				<br />
+				<p:panelGrid columns="2">
+					<p:outputLabel value="Total number of shelves(Nx)*: " />
+					<p:inputText id="txtNx" value="#{pTPController.propertiesBean.nx}"
+						maxlength="4" />
+
+					<p:outputLabel value="Total number of aisles(Na)*: " />
+					<p:inputText id="txtNa" value="#{pTPController.propertiesBean.na}"
+						maxlength="4" />
+
+					<p:outputLabel value="Total number of shelf levels(Nz)*: " />
+					<p:inputText id="txtNz" value="#{pTPController.propertiesBean.nz}"
+						maxlength="4" />
+
+					<p:outputLabel value="Width of shelf(Wp)*: " />
+					<p:inputText id="txtWp" value="#{pTPController.propertiesBean.wp}"
+						maxlength="4" />
+
+					<p:outputLabel value="Width of aisle(Wa)*: " />
+					<p:inputText id="txtWa" value="#{pTPController.propertiesBean.wa}"
+						maxlength="4" />
+
+					<p:outputLabel value="Space height of shelf(Hp)*: " />
+					<p:inputText id="txtHp" value="#{pTPController.propertiesBean.hp}"
+						maxlength="4" />
+
+					<p:outputLabel value="Space width of shelf(Lp)*: " />
+					<p:inputText id="txtLp" value="#{pTPController.propertiesBean.lp}"
+						maxlength="4" />
+				</p:panelGrid>
+				<br />
+				<p:fieldset legend="RESTRICTIONS">
+
+					<p:panelGrid columns="6">
+						<h:outputLabel style="width:120px;" value="Product 1: " />
+						<p:autoComplete minQueryLength="3"
+							value="#{pTPController.product1}"
+							completeMethod="#{pTPController.completeText}" effect="fade" />
+
+
+						<h:outputLabel style="width:90px;" value="Restriction: " />
+						<p:selectOneMenu id="txtRestriction" style="width:120px;"
+							class="select" binding="#{resType}">
+							<f:selectItem itemValue="0" itemLabel="SAME CLASS" />
+							<f:selectItem itemValue="2" itemLabel="DIFFERENT CLASS" />
+							<f:selectItem itemValue="1" itemLabel="CONTIGUOUS CLASS" />
+						</p:selectOneMenu>
+
+						<h:outputLabel style="width:120px;" value="Product 2: " />
+						<p:autoComplete minQueryLength="3"
+							value="#{pTPController.product2}"
+							completeMethod="#{pTPController.completeText}" effect="fade" />
+
+						<f:facet name="footer">
+							<p:commandButton value="Add" update="@all"
+								action="#{pTPController.addRestriction(resType.value)}" />
+						</f:facet>
+					</p:panelGrid>
+					<br />
+					<p:dataTable id="tabela"
+						value="${pTPController.propertiesBean.restrictions}" var="item"
+						paginator="true" rows="7" editable="true">
+						<p:column headerText="Name">
+							<h:outputText value="${item.product1.name}" />
+							<f:facet name="header">
+		                        Product 1
+		                    </f:facet>
+						</p:column>
+						<p:column headerText="Restriction" style="width:20%; align:center">
+							<p align="center">${item.resType.name}</p>
+						</p:column>
+						<p:column headerText="Name">
+							<h:outputText value="${item.product2.name}" />
+							<f:facet name="header">
+		                        Product 2
+		                    </f:facet>
+						</p:column>
+						<p:column style="width:10%" headerText="">
+							<p:commandButton value="Remove" update="@all"
+								action="#{pTPController.removeRestriction(item)}" />
+						</p:column>
+					</p:dataTable>
+				</p:fieldset>
+				<br />
+				<p:commandButton value="Run GA" update="messages"
+					action="#{pTPController.runGA()}" />
+
+			</p:fieldset>
+		</c:if>
+	</h:form>
+</h:body>
+</html>
+
